@@ -1,0 +1,39 @@
+name: Deploy Java Web App Environment Variables
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        webapp: [ 'webapp1990', 'webapp2990' ] # 'webapp3', 'webapp4', 'webapp5'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Set Environment Variables for ${{ matrix.webapp }}
+        run: |
+          az webapp config appsettings set \
+            --name ${{ matrix.webapp }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --settings JAVA_VERSION=21 \
+                       APP_INSIGHTS_INSTRUMENTATION_KEY=some_App_Insight_KEY_value \
+                       SPRING_PROFILES_ACTIVE=prod \
+                       SERVER_PORT=80 \
+                       LOG_LEVEL=INFO \
+                       DATABASE_URL=some_DB_value \
+                       API_KEY=some_API_KEY_value
+      
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ matrix.webapp }}
