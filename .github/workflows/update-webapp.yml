@@ -19,19 +19,26 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
+
       - name: Set Environment Variables for ${{ matrix.webapp }}
         run: |
           az webapp config appsettings set \
             --name ${{ matrix.webapp }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --settings JAVA_VERSION=21 \
-                       APP_INSIGHTS_INSTRUMENTATION_KEY=${{ secrets.APP_INSIGHTS_KEY }} \
-                       SPRING_PROFILES_ACTIVE=prod \
-                       SERVER_PORT=80 \
-                       LOG_LEVEL=INFO \
-                       DATABASE_URL=some_DB_value \
-                       API_KEY=some_API_KEY_value
+            --settings @appsettings.json
+      
+      # - name: Set Environment Variables for ${{ matrix.webapp }}
+      #   run: |
+      #     az webapp config appsettings set \
+      #       --name ${{ matrix.webapp }} \
+      #       --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #       --settings JAVA_VERSION=21 \
+      #                  APP_INSIGHTS_INSTRUMENTATION_KEY=${{ secrets.APP_INSIGHTS_KEY }} \
+      #                  SPRING_PROFILES_ACTIVE=prod \
+      #                  SERVER_PORT=80 \
+      #                  LOG_LEVEL=INFO \
+      #                  DATABASE_URL=some_DB_value \
+      #                  API_KEY=some_API_KEY_value
       
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
