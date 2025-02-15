@@ -20,12 +20,23 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+
       - name: Set Environment Variables for ${{ matrix.webapp }}
         run: |
+          APP_SETTINGS=$(jq -r 'to_entries | map("\(.key)=\(.value)") | join(" ")' appsettings.json)
+          # Append a GitHub secret value, e.g., SECRET_VAR
+          APP_SETTINGS="$APP_SETTINGS SECRET_VAR=${{ secrets.SECRET_VAR }}"
           az webapp config appsettings set \
             --name ${{ matrix.webapp }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --settings @appsettings.json
+            --settings $APP_SETTINGS
+            
+      # - name: Set Environment Variables for ${{ matrix.webapp }}
+      #   run: |
+      #     az webapp config appsettings set \
+      #       --name ${{ matrix.webapp }} \
+      #       --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+      #       --settings @appsettings.json
       
       # - name: Set Environment Variables for ${{ matrix.webapp }}
       #   run: |
