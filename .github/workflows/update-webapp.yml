@@ -40,7 +40,4 @@ jobs:
       #                  DATABASE_URL=some_DB_value \
       #                  API_KEY=some_API_KEY_value
       
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ matrix.webapp }}
+
